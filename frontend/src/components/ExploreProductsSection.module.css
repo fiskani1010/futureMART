@@ -1,0 +1,245 @@
+.section {
+  width: min(1200px, 100%);
+  margin: 30px auto 0;
+  padding: 28px 24px 34px;
+  border-top: 1px solid #e0e5ee;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.eyebrow {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #dd4c4c;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.eyebrow span {
+  width: 12px;
+  height: 22px;
+  border-radius: 3px;
+  background: #dd4c4c;
+}
+
+.head h2 {
+  margin: 8px 0 0;
+  color: #111827;
+  font-size: clamp(1.4rem, 1.2rem + 0.6vw, 2rem);
+}
+
+.arrows {
+  display: flex;
+  gap: 8px;
+}
+
+.arrows button {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid #d6dde9;
+  background: #fff;
+  color: #34405a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.arrows button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.message {
+  margin: 18px 0 0;
+  color: #66738d;
+}
+
+.grid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px 12px;
+}
+
+.card {
+  background: #fff;
+}
+
+.imageWrap {
+  position: relative;
+  background: #f2f4f8;
+  min-height: 190px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.imageWrap img {
+  width: 100%;
+  height: 190px;
+  object-fit: contain;
+}
+
+.newBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  border-radius: 3px;
+  background: #00d15d;
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 700;
+  padding: 3px 8px;
+}
+
+.actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  gap: 7px;
+}
+
+.iconButton {
+  width: 29px;
+  height: 29px;
+  border-radius: 999px;
+  border: 1px solid #dbe2ee;
+  background: #fff;
+  color: #47526b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.iconButtonActive {
+  border-color: #e25555;
+  background: #ffe8e8;
+  color: #d54646;
+}
+
+.cartButton {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 0;
+  background: #000;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 8px 6px;
+  cursor: pointer;
+}
+
+.card h3 {
+  margin: 10px 0 0;
+  color: #121b2d;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.card h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.priceRow {
+  margin: 6px 0 0;
+  display: inline-flex;
+  gap: 7px;
+  align-items: baseline;
+}
+
+.price {
+  color: #db4444;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.oldPrice {
+  color: #8c94a6;
+  font-size: 0.76rem;
+  text-decoration: line-through;
+}
+
+.ratingRow {
+  margin: 6px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #7a8399;
+  font-size: 0.72rem;
+}
+
+.stars {
+  color: #f4ab33;
+  display: inline-flex;
+  gap: 1px;
+}
+
+.viewAllWrap {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.viewAllButton {
+  border: 1px solid #db4444;
+  background: #db4444;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 3px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 12px 34px;
+}
+
+.viewAllButton:hover {
+  background: #cb3d3d;
+  border-color: #cb3d3d;
+}
+
+@media (max-width: 980px) {
+  .section {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .grid {
+    display: grid;
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(220px, 1fr);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 10px;
+    padding-bottom: 10px;
+    scrollbar-width: none;
+  }
+
+  .grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .card {
+    scroll-snap-align: start;
+  }
+}

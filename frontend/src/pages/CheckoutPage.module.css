@@ -1,0 +1,319 @@
+.page {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding: 28px 24px 52px;
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  color: #7b8394;
+  font-size: 0.85rem;
+  margin-bottom: 26px;
+}
+
+.breadcrumb a {
+  text-decoration: none;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 460px);
+  gap: 42px;
+  align-items: start;
+}
+
+.billingSection h1 {
+  margin: 0 0 24px;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.billingSection {
+  display: grid;
+  gap: 16px;
+}
+
+.billingSection label {
+  display: grid;
+  gap: 8px;
+  color: #70798a;
+  font-size: 0.9rem;
+}
+
+.billingSection input {
+  border: 1px solid #eaedf2;
+  background: #f7f7f7;
+  border-radius: 4px;
+  padding: 13px 12px;
+  color: #1f2937;
+}
+
+.billingSection input:focus,
+.couponRow input:focus,
+.bankSelectWrap select:focus {
+  outline: none;
+  border-color: #db4444;
+  box-shadow: 0 0 0 1px rgba(219, 68, 68, 0.25);
+}
+
+.saveInfo {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #232933;
+}
+
+.saveInfo input {
+  accent-color: #db4444;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+.summarySection {
+  display: grid;
+  gap: 18px;
+}
+
+.productList {
+  display: grid;
+  gap: 12px;
+}
+
+.productRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.productMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.productMeta img {
+  width: 54px;
+  height: 54px;
+  border-radius: 4px;
+  object-fit: cover;
+  background: #f2f4f8;
+}
+
+.productMeta span {
+  font-size: 0.9rem;
+  color: #1f2937;
+}
+
+.productRow strong {
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.totalRows {
+  display: grid;
+  border-top: 1px solid #e8ebf2;
+  border-bottom: 1px solid #e8ebf2;
+}
+
+.totalRows div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid #eceff4;
+  font-size: 0.92rem;
+}
+
+.totalRows div:last-child {
+  border-bottom: 0;
+}
+
+.totalLine strong {
+  font-size: 1rem;
+}
+
+.paymentMethods {
+  display: grid;
+  gap: 10px;
+}
+
+.paymentOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.paymentOption input {
+  margin-top: 3px;
+  accent-color: #db4444;
+}
+
+.paymentOption span {
+  display: grid;
+  gap: 2px;
+}
+
+.paymentOption strong {
+  color: #161d2b;
+  font-size: 0.9rem;
+}
+
+.paymentOption small {
+  color: #6f788a;
+  font-size: 0.78rem;
+}
+
+.bankSelectWrap {
+  display: grid;
+  gap: 8px;
+  color: #5f6879;
+  font-size: 0.86rem;
+}
+
+.bankSelectWrap select {
+  border: 1px solid #d9dfeb;
+  border-radius: 4px;
+  padding: 10px 11px;
+  background: #fff;
+}
+
+.couponRow {
+  display: flex;
+  gap: 10px;
+}
+
+.couponRow input {
+  flex: 1;
+  border: 1px solid #d5dbe7;
+  border-radius: 4px;
+  padding: 11px 12px;
+}
+
+.couponRow button,
+.placeOrderButton,
+.primaryButton {
+  border: 1px solid #db4444;
+  background: #db4444;
+  color: #fff;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.couponRow button {
+  min-width: 136px;
+  padding: 0 16px;
+}
+
+.placeOrderButton {
+  width: min(170px, 100%);
+  padding: 11px 14px;
+}
+
+.placeOrderButton:disabled {
+  border-color: #cbd3e1;
+  background: #cbd3e1;
+  cursor: not-allowed;
+}
+
+.couponMessage,
+.authNote,
+.errorMessage,
+.successMessage {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.couponMessage {
+  color: #2b6a3f;
+}
+
+.authNote {
+  color: #5a667f;
+}
+
+.authNote a {
+  color: #db4444;
+  text-decoration: none;
+}
+
+.errorMessage {
+  color: #bb2f2f;
+}
+
+.successMessage {
+  color: #1f7a3f;
+}
+
+.message,
+.emptyState {
+  border: 1px solid #e6eaf2;
+  background: #fff;
+  border-radius: 10px;
+  padding: 28px 24px;
+}
+
+.emptyState h1 {
+  margin: 0 0 10px;
+}
+
+.emptyActions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.primaryButton,
+.secondaryButton {
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondaryButton {
+  border: 1px solid #d6dce8;
+  background: #fff;
+  color: #232d3c;
+}
+
+@media (max-width: 980px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .summarySection {
+    max-width: 620px;
+  }
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 18px 14px 30px;
+  }
+
+  .billingSection h1 {
+    font-size: 1.7rem;
+  }
+
+  .couponRow {
+    flex-direction: column;
+  }
+
+  .couponRow button,
+  .placeOrderButton {
+    width: 100%;
+  }
+}

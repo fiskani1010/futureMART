@@ -1,0 +1,13 @@
+{
+  "name": "ecommerce-workspace",
+  "private": true,
+  "scripts": {
+    "dev": "set \"PATH=%PATH%;C:\\Windows\\System32\" && concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "backend": "npm --prefix backend run dev",
+    "frontend": "npm --prefix frontend run dev",
+    "check:deploy": "npm --prefix backend test && npm --prefix frontend run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

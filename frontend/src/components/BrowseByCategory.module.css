@@ -1,0 +1,152 @@
+.section {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 28px 24px;
+  border-top: 1px solid #e0e5ee;
+  border-bottom: 1px solid #e0e5ee;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.eyebrow {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #dd4c4c;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.eyebrow span {
+  width: 12px;
+  height: 22px;
+  border-radius: 3px;
+  background: #dd4c4c;
+}
+
+.head h2 {
+  margin: 8px 0 0;
+  font-size: clamp(1.4rem, 1.2rem + 0.7vw, 2rem);
+  color: #111827;
+}
+
+.arrows {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arrows button {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid #d3dbe8;
+  background: #fff;
+  color: #2b3449;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.arrows button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.arrows button:hover {
+  background: #f5f8fd;
+}
+
+.grid {
+  margin-top: 22px;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  gap: 12px;
+  padding-bottom: 6px;
+}
+
+.grid::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  flex: 0 0 158px;
+  min-height: 110px;
+  border: 1px solid #d7deea;
+  border-radius: 3px;
+  background: #fff;
+  text-decoration: none;
+  color: #232b3b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  scroll-snap-align: start;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.card svg {
+  font-size: 1.3rem;
+}
+
+.card span {
+  font-size: 0.79rem;
+  font-weight: 500;
+}
+
+.card small {
+  margin-top: -2px;
+  color: #677287;
+  font-size: 0.72rem;
+}
+
+.card:hover {
+  border-color: #c2ccde;
+  background: #f8fbff;
+}
+
+.cardFeatured {
+  background: #db4444;
+  border-color: #db4444;
+  color: #fff;
+}
+
+.cardFeatured small {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.cardFeatured:hover {
+  background: #cf3f3f;
+  border-color: #cf3f3f;
+}
+
+@media (max-width: 980px) {
+  .section {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .grid {
+    gap: 10px;
+  }
+
+  .card {
+    flex-basis: 140px;
+  }
+}
+
+@media (max-width: 700px) {
+  .head h2 {
+    font-size: 1.5rem;
+  }
+}
