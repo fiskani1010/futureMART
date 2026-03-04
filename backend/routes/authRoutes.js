@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const {
     registerUser,
-    verifyRegistrationCode,
     requestPasswordResetCode,
     resetPasswordWithCode,
     loginUser,
@@ -36,8 +35,8 @@ const otpLimiter = createRateLimiter({
 });
 
 router.post("/register", authLimiter, registerUser);
-router.post("/register/request-code", authLimiter, otpLimiter, registerUser);
-router.post("/register/verify-code", authLimiter, otpLimiter, verifyRegistrationCode);
+// Legacy alias for older frontend builds. Registration now creates the account immediately.
+router.post("/register/request-code", authLimiter, registerUser);
 router.post("/password/request-code", authLimiter, otpLimiter, requestPasswordResetCode);
 router.post("/password/reset", authLimiter, otpLimiter, resetPasswordWithCode);
 router.post("/login", authLimiter, loginLimiter, loginUser);

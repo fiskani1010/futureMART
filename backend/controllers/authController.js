@@ -41,13 +41,6 @@ const parseOtpPayload = (payloadJson) => {
 
 const generateOtpCode = () => String(Math.floor(100000 + Math.random() * 900000));
 
-const maskEmail = (email) => {
-    const [localPart, domain] = String(email || "").split("@");
-    if (!localPart || !domain) return email;
-    if (localPart.length <= 2) return `**@${domain}`;
-    return `${localPart.slice(0, 2)}${"*".repeat(Math.max(2, localPart.length - 2))}@${domain}`;
-};
-
 const getOtpEmailTemplate = ({ code, purpose, recipientName = "" }) => {
     const purposeLabel =
         purpose === OTP_PURPOSES.RESET_PASSWORD ? "password reset" : "account registration";
@@ -407,7 +400,7 @@ const getPublicUserPayload = (user) => ({
     role: user.role,
 });
 
-// REGISTER USER - Step 1: request OTP code
+// REGISTER USER - create account immediately (email verification removed)
 exports.registerUser = async (req, res) => {
     const name = String(req.body?.name || "").trim();
     const email = normalizeEmail(req.body?.email);
@@ -428,74 +421,24 @@ exports.registerUser = async (req, res) => {
         }
 
         const passwordHash = await bcrypt.hash(password, 12);
-        const otpCode = generateOtpCode();
+        await query("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", [name, email, passwordHash]);
 
-        await saveOtpCode({
-            email,
-            purpose: OTP_PURPOSES.REGISTER,
-            code: otpCode,
-            payload: {
-                name,
-                password_hash: passwordHash,
-            },
-        });
-
-        await sendOtpEmail({
-            to: email,
-            code: otpCode,
-            purpose: OTP_PURPOSES.REGISTER,
-            recipientName: name,
-        });
-
-        return res.status(200).json({
-            message: `A 6-digit verification code was sent to ${maskEmail(email)}.`,
+        return res.status(201).json({
+            message: "Account created successfully. You can now log in.",
         });
     } catch (error) {
-        console.error("Could not send registration code:", error.message);
+        console.error("Could not register user:", error.message);
         return res.status(500).json({
-            message: getPublicOtpErrorMessage(error, "Could not send verification code"),
+            message: "Could not create account right now",
         });
     }
 };
 
-// REGISTER USER - Step 2: verify OTP and create account
+// Deprecated: email verification was removed.
 exports.verifyRegistrationCode = async (req, res) => {
-    const email = normalizeEmail(req.body?.email);
-    const code = String(req.body?.code || "").trim();
-
-    if (!email || !code) {
-        return res.status(400).json({ message: "Email and verification code are required" });
-    }
-
-    try {
-        const validation = await validateOtpCode({
-            email,
-            purpose: OTP_PURPOSES.REGISTER,
-            code,
-        });
-
-        if (!validation.ok) {
-            return res.status(400).json({ message: validation.message });
-        }
-
-        const payload = validation.payload || {};
-        const name = String(payload.name || "").trim();
-        const passwordHash = String(payload.password_hash || "").trim();
-        if (!name || !passwordHash) {
-            return res.status(400).json({ message: "Verification payload is invalid. Request a new code." });
-        }
-
-        const existingRows = await query("SELECT id FROM users WHERE email = ? LIMIT 1", [email]);
-        if (existingRows.length > 0) {
-            return res.status(409).json({ message: "Email already exists" });
-        }
-
-        await query("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", [name, email, passwordHash]);
-        return res.status(201).json({ message: "Account verified and created successfully" });
-    } catch (error) {
-        console.error("Could not verify registration code:", error.message);
-        return res.status(500).json({ message: "Could not verify code right now" });
-    }
+    return res.status(410).json({
+        message: "Email verification is disabled. Submit registration details directly.",
+    });
 };
 
 // FORGOT PASSWORD - Step 1: request OTP code

@@ -19,23 +19,12 @@ export default function Register({ onSwitchToLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [otpCode, setOtpCode] = useState("");
-  const [step, setStep] = useState("details");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const resetAll = () => {
-    setName("");
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    setOtpCode("");
-    setStep("details");
-  };
-
-  const requestCode = async () => {
-    const res = await fetch(buildApiUrl("/auth/register/request-code"), {
+  const registerAccount = async () => {
+    const res = await fetch(buildApiUrl("/auth/register"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -45,87 +34,35 @@ export default function Register({ onSwitchToLogin }) {
     return { ok: res.ok, status: res.status, data };
   };
 
-  const verifyCode = async () => {
-    const res = await fetch(buildApiUrl("/auth/register/verify-code"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ email, code: otpCode }),
-    });
-    const data = await parseResponsePayload(res);
-    return { ok: res.ok, status: res.status, data };
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (isSubmitting) return;
+
     setMessage("");
     setIsError(false);
 
-    if (step === "details") {
-      if (password !== confirmPassword) {
-        setMessage("Passwords do not match.");
-        setIsError(true);
-        return;
-      }
-
-      setIsSubmitting(true);
-      try {
-        const result = await requestCode();
-        if (result.ok) {
-          setStep("verify");
-          setMessage(result.data.message || "Verification code sent to your email.");
-          setIsError(false);
-        } else {
-          setMessage(result.data.message || `Could not send verification code (${result.status}).`);
-          setIsError(true);
-        }
-      } catch {
-        setMessage("Request failed. Check API URL and CORS settings.");
-        setIsError(true);
-      } finally {
-        setIsSubmitting(false);
-      }
-      return;
-    }
-
-    if (!otpCode.trim() || otpCode.trim().length !== 6) {
-      setMessage("Enter the 6-digit verification code sent to your email.");
+    if (password !== confirmPassword) {
+      setMessage("Passwords do not match.");
       setIsError(true);
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const result = await verifyCode();
+      const result = await registerAccount();
       if (result.ok) {
-        setMessage(result.data.message || "Registration completed. You can now log in.");
+        setMessage(result.data.message || "Account created successfully. You can now log in.");
         setIsError(false);
-        resetAll();
+        resetForm();
       } else {
-        setMessage(result.data.message || `Invalid verification code (${result.status}).`);
-        setIsError(true);
-      }
-    } catch {
-      setMessage("Request failed. Check API URL and CORS settings.");
-      setIsError(true);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleResendCode = async () => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-    setMessage("");
-    setIsError(false);
-    try {
-      const result = await requestCode();
-      if (result.ok) {
-        setMessage(result.data.message || "A new code has been sent.");
-        setIsError(false);
-      } else {
-        setMessage(result.data.message || `Could not resend verification code (${result.status}).`);
+        setMessage(result.data.message || `Could not create account (${result.status}).`);
         setIsError(true);
       }
     } catch {
@@ -151,96 +88,56 @@ export default function Register({ onSwitchToLogin }) {
             Back to Home
           </Link>
           <h2 className={styles.title}>Create an account</h2>
-          <p className={styles.subtitle}>
-            {step === "details" ? "Enter your details below" : "Enter the 6-digit code sent to your email"}
-          </p>
+          <p className={styles.subtitle}>Enter your details below</p>
 
           <form onSubmit={handleSubmit} className={styles.form}>
-            {step === "details" ? (
-              <>
-                <div className={styles.inputGroup}>
-                  <AiOutlineUser className={styles.icon} />
-                  <input
-                    type="text"
-                    placeholder="Full Name"
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                    required
-                  />
-                </div>
+            <div className={styles.inputGroup}>
+              <AiOutlineUser className={styles.icon} />
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                required
+              />
+            </div>
 
-                <div className={styles.inputGroup}>
-                  <AiOutlineMail className={styles.icon} />
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    required
-                  />
-                </div>
+            <div className={styles.inputGroup}>
+              <AiOutlineMail className={styles.icon} />
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
+            </div>
 
-                <div className={styles.inputGroup}>
-                  <AiOutlineLock className={styles.icon} />
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    required
-                  />
-                </div>
+            <div className={styles.inputGroup}>
+              <AiOutlineLock className={styles.icon} />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+              />
+            </div>
 
-                <div className={styles.inputGroup}>
-                  <AiOutlineLock className={styles.icon} />
-                  <input
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={(event) => setConfirmPassword(event.target.value)}
-                    required
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className={styles.inputGroup}>
-                  <AiOutlineMail className={styles.icon} />
-                  <input type="email" value={email} disabled aria-label="Registered email" />
-                </div>
-
-                <div className={styles.inputGroup}>
-                  <AiOutlineLock className={styles.icon} />
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]{6}"
-                    maxLength={6}
-                    placeholder="6-digit verification code"
-                    value={otpCode}
-                    onChange={(event) => setOtpCode(event.target.value.replace(/\D/g, ""))}
-                    required
-                  />
-                </div>
-
-                <div className={styles.secondaryActions}>
-                  <button type="button" className={styles.ghostActionBtn} onClick={() => setStep("details")}>
-                    Edit details
-                  </button>
-                  <button type="button" className={styles.ghostActionBtn} onClick={handleResendCode}>
-                    Resend code
-                  </button>
-                </div>
-              </>
-            )}
+            <div className={styles.inputGroup}>
+              <AiOutlineLock className={styles.icon} />
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                required
+              />
+            </div>
 
             <div className={styles.actions}>
               <button type="submit" className={styles.loginBtn}>
-                {isSubmitting
-                  ? "Please wait..."
-                  : step === "details"
-                    ? "Send Verification Code"
-                    : "Verify & Create Account"}
+                {isSubmitting ? "Please wait..." : "Create Account"}
               </button>
             </div>
           </form>
