@@ -8,6 +8,7 @@ import {
   AiOutlineLeft,
   AiOutlineRight,
 } from "react-icons/ai";
+import InlineLoader from "./InlineLoader";
 import styles from "./ExploreProductsSection.module.css";
 import {
   WISHLIST_UPDATED_EVENT,
@@ -167,7 +168,9 @@ export default function ExploreProductsSection() {
       </header>
 
       {isLoading ? (
-        <p className={styles.message}>Loading products...</p>
+        <p className={styles.message}>
+          <InlineLoader label="Loading products..." />
+        </p>
       ) : !hasProducts ? (
         <p className={styles.message}>No products available right now.</p>
       ) : (
@@ -206,9 +209,9 @@ export default function ExploreProductsSection() {
                 </h3>
 
                 <p className={styles.priceRow}>
-                  <span className={styles.price}>${product.price.toFixed(2)}</span>
+                  <span className={styles.price}>MWK {product.price.toFixed(2)}</span>
                   {product.oldPrice !== null && product.oldPrice > product.price ? (
-                    <span className={styles.oldPrice}>${product.oldPrice.toFixed(2)}</span>
+                    <span className={styles.oldPrice}>MWK {product.oldPrice.toFixed(2)}</span>
                   ) : null}
                 </p>
 

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import InlineLoader from "../components/InlineLoader";
 import ProductCard from "../components/ProductCard";
 import styles from "./ProductListingPage.module.css";
 import {
@@ -92,7 +93,9 @@ export default function WishlistPage() {
       </section>
 
       {loading ? (
-        <section className={styles.messageCard}>Loading wishlist...</section>
+        <section className={styles.messageCard}>
+          <InlineLoader label="Loading wishlist..." />
+        </section>
       ) : errorMessage ? (
         <section className={`${styles.messageCard} ${styles.error}`}>{errorMessage}</section>
       ) : lovedProducts.length === 0 ? (

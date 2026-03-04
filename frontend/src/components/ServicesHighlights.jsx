@@ -5,7 +5,7 @@ const POINTS = [
   {
     icon: AiOutlineCar,
     title: "FREE AND FAST DELIVERY",
-    text: "Free delivery for all orders over $140",
+    text: "Free delivery for all orders over MWK 140",
   },
   {
     icon: AiOutlineCustomerService,

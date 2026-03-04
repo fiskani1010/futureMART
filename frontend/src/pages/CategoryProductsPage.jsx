@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import InlineLoader from "../components/InlineLoader";
 import ProductCard from "../components/ProductCard";
 import styles from "./ProductListingPage.module.css";
 import { categoryMatchesSlug, findCategoryDisplayName } from "../utils/categoryUtils";
@@ -106,7 +107,9 @@ export default function CategoryProductsPage() {
       </section>
 
       {loading ? (
-        <section className={styles.messageCard}>Loading products...</section>
+        <section className={styles.messageCard}>
+          <InlineLoader label="Loading products..." />
+        </section>
       ) : errorMessage ? (
         <section className={`${styles.messageCard} ${styles.error}`}>{errorMessage}</section>
       ) : visibleProducts.length === 0 ? (

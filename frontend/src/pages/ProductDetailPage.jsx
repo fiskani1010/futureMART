@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { AiFillStar, AiOutlineHeart, AiOutlineReload, AiOutlineTruck } from "react-icons/ai";
+import InlineLoader from "../components/InlineLoader";
 import styles from "./ProductDetailPage.module.css";
 import { addToCart } from "../utils/shopStorage";
 
@@ -124,7 +125,9 @@ export default function ProductDetailPage() {
   if (loading) {
     return (
       <main className={styles.page}>
-        <section className={styles.message}>Loading product details...</section>
+        <section className={styles.message}>
+          <InlineLoader label="Loading product details..." />
+        </section>
       </main>
     );
   }
@@ -182,7 +185,7 @@ export default function ProductDetailPage() {
             </span>
           </div>
 
-          <p className={styles.price}>${Number(product.price).toFixed(2)}</p>
+          <p className={styles.price}>MWK {Number(product.price).toFixed(2)}</p>
           <p className={styles.description}>
             {product.description || "No product description available."}
           </p>
@@ -221,7 +224,7 @@ export default function ProductDetailPage() {
             </button>
           </div>
 
-          <p className={styles.subtotal}>Subtotal: ${subtotal.toFixed(2)}</p>
+          <p className={styles.subtotal}>Subtotal: MWK {subtotal.toFixed(2)}</p>
 
           <div className={styles.deliveryCard}>
             <article>
@@ -251,7 +254,7 @@ export default function ProductDetailPage() {
                 <img src={resolveImageUrl(item.image)} alt={item.name} />
                 <h2>{item.name}</h2>
               </Link>
-              <p>${Number(item.price).toFixed(2)}</p>
+              <p>MWK {Number(item.price).toFixed(2)}</p>
             </article>
           ))}
         </div>

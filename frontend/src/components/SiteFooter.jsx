@@ -72,7 +72,7 @@ export default function SiteFooter() {
 
         <div>
           <h4>Download App</h4>
-          <p className={styles.downloadText}>Save $3 with App New User Only</p>
+          <p className={styles.downloadText}>Save MWK 3 with App New User Only</p>
           <div className={styles.downloadRow}>
             <img
               src="https://api.qrserver.com/v1/create-qr-code/?size=88x88&data=https://exclusive-store.app"

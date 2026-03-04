@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import InlineLoader from "../components/InlineLoader";
 import styles from "./AccountPage.module.css";
 import { WISHLIST_UPDATED_EVENT, getWishlistCount } from "../utils/shopStorage";
 import { clearAuthUser } from "../utils/authStorage";
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 
-const formatMoney = (value) => `Mkw ${Number(value || 0).toFixed(2)}`;
+const formatMoney = (value) => `MWK ${Number(value || 0).toFixed(2)}`;
 const formatDate = (value) => {
   const date = value ? new Date(value) : null;
   if (!date || Number.isNaN(date.getTime())) return "N/A";
@@ -258,7 +259,9 @@ export default function AccountPage() {
   if (authLoading) {
     return (
       <main className={styles.page}>
-        <section className={styles.messageCard}>Loading your account...</section>
+        <section className={styles.messageCard}>
+          <InlineLoader label="Loading your account..." />
+        </section>
       </main>
     );
   }
@@ -355,7 +358,9 @@ export default function AccountPage() {
               <h2>Edit Your Profile</h2>
 
               {profileLoading ? (
-                <p className={styles.inlineMessage}>Loading profile...</p>
+                <p className={styles.inlineMessage}>
+                  <InlineLoader label="Loading profile..." />
+                </p>
               ) : (
                 <>
                   <div className={styles.twoCols}>
@@ -476,7 +481,9 @@ export default function AccountPage() {
             <section className={styles.ordersCard}>
               <h2>Purchase History</h2>
               {ordersLoading ? (
-                <p className={styles.inlineMessage}>Loading purchase history...</p>
+                <p className={styles.inlineMessage}>
+                  <InlineLoader label="Loading purchase history..." />
+                </p>
               ) : orders.length === 0 ? (
                 <p className={styles.inlineMessage}>
                   No purchases yet. <Link to="/category/all-products">Start shopping</Link>.

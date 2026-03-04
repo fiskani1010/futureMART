@@ -60,7 +60,7 @@ export default function ProductCard({ product, isLoved, onToggleLove, onBuy }) {
         <p className={styles.description}>{product.description || "No description available."}</p>
 
         <div className={styles.metaRow}>
-          <strong className={styles.price}>${Number(product.price || 0).toFixed(2)}</strong>
+          <strong className={styles.price}>MWK {Number(product.price || 0).toFixed(2)}</strong>
           <span className={`${styles.stock} ${isOutOfStock ? styles.stockOut : styles.stockIn}`}>
             {getStockLabel(stockValue)}
           </span>

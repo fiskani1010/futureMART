@@ -12,6 +12,7 @@ import {
   AiOutlineTags,
   AiOutlineTeam,
 } from "react-icons/ai";
+import InlineLoader from "../components/InlineLoader";
 import NewArrivalManager from "../components/admin/NewArrivalManager";
 import styles from "./AdminPage.module.css";
 import { STORE_CATEGORY_NAMES } from "../constants/storeCategories";
@@ -52,7 +53,7 @@ const ADMIN_MODULES = [
     label: "Orders",
     hint: "Track customer orders",
     Icon: AiOutlineProfile,
-    comingSoon: true,
+    comingSoon: false,
   },
   {
     id: "users",
@@ -97,6 +98,14 @@ const getInitialTeamForm = (displayOrder = 1) => ({
   is_active: true,
 });
 
+const formatMoney = (value) => `MWK ${Number(value || 0).toFixed(2)}`;
+
+const formatDateTime = (value) => {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "Unknown date";
+  return parsed.toLocaleString();
+};
+
 export default function AdminPage() {
   const navigate = useNavigate();
   const [authChecked, setAuthChecked] = useState(false);
@@ -106,10 +115,12 @@ export default function AdminPage() {
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isUsersLoading, setIsUsersLoading] = useState(false);
   const [isProductsLoading, setIsProductsLoading] = useState(false);
   const [isTeamLoading, setIsTeamLoading] = useState(false);
+  const [isOrdersLoading, setIsOrdersLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isRoleSaving, setIsRoleSaving] = useState(false);
   const [isProductSaving, setIsProductSaving] = useState(false);
@@ -121,6 +132,7 @@ export default function AdminPage() {
   const [usersStatus, setUsersStatus] = useState({ type: "", text: "" });
   const [productStatus, setProductStatus] = useState({ type: "", text: "" });
   const [teamStatus, setTeamStatus] = useState({ type: "", text: "" });
+  const [ordersStatus, setOrdersStatus] = useState({ type: "", text: "" });
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(getInitialForm());
   const [productEditingId, setProductEditingId] = useState(null);
@@ -163,6 +175,10 @@ export default function AdminPage() {
   const selectedModule = useMemo(
     () => ADMIN_MODULES.find((module) => module.id === activeModule) || ADMIN_MODULES[0],
     [activeModule],
+  );
+  const pendingOrdersCount = useMemo(
+    () => orders.filter((order) => String(order?.status || "").toLowerCase() === "pending").length,
+    [orders],
   );
 
   const resolveImageUrl = (rawUrl) => {
@@ -342,6 +358,36 @@ export default function AdminPage() {
     }
   };
 
+  const loadOrders = async () => {
+    setIsOrdersLoading(true);
+    setOrdersStatus({ type: "", text: "" });
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/orders`, {
+        credentials: "include",
+      });
+
+      const data = await response.json().catch(() => []);
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          setAuthError("Admin access is required. Login with an admin account.");
+        } else {
+          setOrdersStatus({ type: "error", text: data.message || "Could not load orders." });
+        }
+        return [];
+      }
+
+      const list = Array.isArray(data) ? data : [];
+      setOrders(list);
+      return list;
+    } catch {
+      setOrdersStatus({ type: "error", text: "Network error while loading orders." });
+      return [];
+    } finally {
+      setIsOrdersLoading(false);
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
 
@@ -401,6 +447,11 @@ export default function AdminPage() {
   useEffect(() => {
     if (!authChecked || authError) return;
     loadTeamMembers();
+  }, [authChecked, authError]);
+
+  useEffect(() => {
+    if (!authChecked || authError) return;
+    loadOrders();
   }, [authChecked, authError]);
 
   useEffect(() => {
@@ -939,6 +990,13 @@ export default function AdminPage() {
     }
   };
 
+  const getOrderStatusClassName = (statusValue) => {
+    const normalized = String(statusValue || "").toLowerCase();
+    if (normalized === "completed" || normalized === "delivered") return styles.active;
+    if (normalized === "cancelled" || normalized === "canceled") return styles.inactive;
+    return styles.pending;
+  };
+
   return (
     <main className={styles.page}>
       <section className={styles.heroPanel}>
@@ -972,11 +1030,17 @@ export default function AdminPage() {
               <span className={styles.statLabel}>Admins</span>
               <strong>{adminUsersCount}</strong>
             </div>
+            <div className={styles.statItem}>
+              <span className={styles.statLabel}>Pending Orders</span>
+              <strong>{pendingOrdersCount}</strong>
+            </div>
           </div>
       </section>
 
       {!authChecked ? (
-        <section className={styles.messageCard}>Checking admin access...</section>
+        <section className={styles.messageCard}>
+          <InlineLoader label="Checking admin access..." />
+        </section>
       ) : authError ? (
         <section className={styles.messageCard}>
           <p>{authError}</p>
@@ -1154,7 +1218,9 @@ export default function AdminPage() {
                   </div>
 
                   {isLoading ? (
-                    <p className={styles.listMessage}>Loading slides...</p>
+                    <p className={styles.listMessage}>
+                      <InlineLoader label="Loading slides..." />
+                    </p>
                   ) : slides.length === 0 ? (
                     <p className={styles.listMessage}>No slides found. Create your first slide.</p>
                   ) : (
@@ -1368,7 +1434,9 @@ export default function AdminPage() {
                   </div>
 
                   {isProductsLoading ? (
-                    <p className={styles.listMessage}>Loading products...</p>
+                    <p className={styles.listMessage}>
+                      <InlineLoader label="Loading products..." />
+                    </p>
                   ) : products.length === 0 ? (
                     <p className={styles.listMessage}>No products found. Add your first product.</p>
                   ) : (
@@ -1387,13 +1455,11 @@ export default function AdminPage() {
                             <h3>{product.name}</h3>
                             <p>{product.description || "No description"}</p>
                             <div className={styles.meta}>
-                              <span className={styles.priceLine}>${Number(product.price).toFixed(2)}</span>
+                              <span className={styles.priceLine}>{formatMoney(product.price)}</span>
                               {Number.isFinite(Number(product.old_price)) &&
                               Number(product.old_price) > Number(product.price) ? (
                                 <>
-                                  <span className={styles.oldPrice}>
-                                    ${Number(product.old_price).toFixed(2)}
-                                  </span>
+                                  <span className={styles.oldPrice}>{formatMoney(product.old_price)}</span>
                                   {product.is_flash_sale ? (
                                     <span className={styles.flashTag}>
                                       Flash -{getDiscountPercentage(product.price, product.old_price)}%
@@ -1590,7 +1656,9 @@ export default function AdminPage() {
                   </div>
 
                   {isTeamLoading ? (
-                    <p className={styles.listMessage}>Loading team members...</p>
+                    <p className={styles.listMessage}>
+                      <InlineLoader label="Loading team members..." />
+                    </p>
                   ) : teamMembers.length === 0 ? (
                     <p className={styles.listMessage}>No team members found. Add the first profile.</p>
                   ) : (
@@ -1640,6 +1708,103 @@ export default function AdminPage() {
                   )}
                 </article>
               </section>
+            ) : activeModule === "orders" ? (
+              <article className={styles.ordersCard}>
+                <div className={styles.usersHead}>
+                  <h3>Customer Orders</h3>
+                  <button
+                    type="button"
+                    className={styles.secondaryBtn}
+                    onClick={() => loadOrders()}
+                    disabled={isOrdersLoading}
+                  >
+                    <AiOutlineReload />
+                    Refresh
+                  </button>
+                </div>
+
+                {isOrdersLoading ? (
+                  <p className={styles.listMessage}>
+                    <InlineLoader label="Loading orders..." />
+                  </p>
+                ) : ordersStatus.type === "error" ? (
+                  <p className={`${styles.status} ${styles.error}`}>{ordersStatus.text}</p>
+                ) : orders.length === 0 ? (
+                  <p className={styles.listMessage}>No customer orders yet.</p>
+                ) : (
+                  <div className={styles.orderList}>
+                    {orders.map((order) => {
+                      const customerName =
+                        `${order?.billing?.first_name || ""} ${order?.billing?.last_name || ""}`.trim() ||
+                        order?.customer?.name ||
+                        "Customer";
+                      const customerEmail =
+                        order?.billing?.email || order?.customer?.email || "No email provided";
+                      const addressSummary = [
+                        order?.billing?.street_address,
+                        order?.billing?.apartment,
+                        order?.billing?.city,
+                      ]
+                        .filter(Boolean)
+                        .join(", ");
+                      const paymentSummary = [order?.payment?.payment_method, order?.payment?.bank_name]
+                        .filter(Boolean)
+                        .join(" - ");
+                      const totalItems = Array.isArray(order?.items)
+                        ? order.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
+                        : 0;
+
+                      return (
+                        <article key={order.id} className={styles.orderRow}>
+                          <div className={styles.orderIdentity}>
+                            <h4>
+                              Order #{order.id}
+                              <span
+                                className={`${styles.orderStatus} ${getOrderStatusClassName(order?.status)}`}
+                              >
+                                {String(order?.status || "pending")}
+                              </span>
+                            </h4>
+                            <p>{customerName}</p>
+                            <p>{customerEmail}</p>
+                            <p>{addressSummary || "No delivery address provided."}</p>
+                            <p>{paymentSummary || "Payment method not specified."}</p>
+                            <p>Placed {formatDateTime(order?.created_at)}</p>
+                            {order?.coupon?.code ? (
+                              <p>
+                                Coupon {order.coupon.code} (-{formatMoney(order.coupon.discount_amount)})
+                              </p>
+                            ) : null}
+                            {Array.isArray(order?.items) && order.items.length > 0 ? (
+                              <div className={styles.orderItems}>
+                                {order.items.map((item, index) => (
+                                  <span
+                                    key={`${order.id}-${item.product_id}-${index}`}
+                                    className={styles.orderItemTag}
+                                  >
+                                    {item.product_name} x{Number(item.quantity) || 0}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : null}
+                          </div>
+
+                          <div className={styles.orderMeta}>
+                            <strong className={styles.orderTotal}>{formatMoney(order?.total_amount)}</strong>
+                            <span className={styles.orderCount}>
+                              {totalItems} item{totalItems === 1 ? "" : "s"}
+                            </span>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {ordersStatus.text && ordersStatus.type !== "error" ? (
+                  <p className={`${styles.status} ${styles.success}`}>{ordersStatus.text}</p>
+                ) : null}
+              </article>
             ) : activeModule === "users" ? (
               <article className={styles.usersCard}>
                 <div className={styles.usersHead}>
@@ -1656,7 +1821,9 @@ export default function AdminPage() {
                 </div>
 
                 {isUsersLoading ? (
-                  <p className={styles.listMessage}>Loading users...</p>
+                  <p className={styles.listMessage}>
+                    <InlineLoader label="Loading users..." />
+                  </p>
                 ) : usersStatus.type === "error" ? (
                   <p className={`${styles.status} ${styles.error}`}>{usersStatus.text}</p>
                 ) : users.length === 0 ? (

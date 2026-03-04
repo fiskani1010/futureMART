@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
+import InlineLoader from "./InlineLoader";
 import { addToCart } from "../utils/shopStorage";
 import styles from "./FlashSalesCarousel.module.css";
 
@@ -111,7 +112,9 @@ export default function FlashSalesCarousel() {
       </div>
 
       {isLoading ? (
-        <p className={styles.message}>Loading flash sale products...</p>
+        <p className={styles.message}>
+          <InlineLoader label="Loading flash sale products..." />
+        </p>
       ) : !hasProducts ? (
         <p className={styles.message}>No flash sale products available right now.</p>
       ) : (
@@ -125,9 +128,9 @@ export default function FlashSalesCarousel() {
               <h4>{product.name}</h4>
 
               <div className={styles.price}>
-                <span className={styles.newPrice}>${product.price.toFixed(2)}</span>
+                <span className={styles.newPrice}>MWK {product.price.toFixed(2)}</span>
                 {product.oldPrice !== null ? (
-                  <span className={styles.oldPrice}>${product.oldPrice.toFixed(2)}</span>
+                  <span className={styles.oldPrice}>MWK {product.oldPrice.toFixed(2)}</span>
                 ) : null}
               </div>
 

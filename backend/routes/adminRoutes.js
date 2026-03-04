@@ -25,6 +25,7 @@ const {
     updateNewArrival,
     deleteNewArrival,
 } = require("../controllers/newArrivalController");
+const { getAdminOrders } = require("../controllers/orderController");
 const { uploadAdminImage } = require("../controllers/uploadController");
 const { authenticateToken, requireAdmin } = require("../middleware/authMiddleware");
 const imageUpload = require("../middleware/imageUploadMiddleware");
@@ -63,5 +64,6 @@ router.get("/new-arrivals", getAdminNewArrivals);
 router.post("/new-arrivals", createNewArrival);
 router.put("/new-arrivals/:id", updateNewArrival);
 router.delete("/new-arrivals/:id", deleteNewArrival);
+router.get("/orders", getAdminOrders);
 
 module.exports = router;

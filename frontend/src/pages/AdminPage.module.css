@@ -59,7 +59,7 @@
 .heroStats {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 10px;
 }
 
@@ -236,7 +236,8 @@
 .listCard,
 .messageCard,
 .comingCard,
-.usersCard {
+.usersCard,
+.ordersCard {
   border: 1px solid #e1e8f4;
   border-radius: 16px;
   background: #fff;
@@ -481,6 +482,7 @@
 }
 
 .active,
+.pending,
 .inactive {
   border-radius: 999px;
   padding: 4px 8px;
@@ -489,6 +491,11 @@
 .active {
   background: #e9f8ef;
   color: #227646;
+}
+
+.pending {
+  background: #fff4e5;
+  color: #9a5a12;
 }
 
 .inactive {
@@ -597,6 +604,11 @@
   padding: 16px;
 }
 
+.ordersCard {
+  margin-top: 12px;
+  padding: 16px;
+}
+
 .usersHead {
   display: flex;
   align-items: center;
@@ -616,6 +628,12 @@
   gap: 9px;
 }
 
+.orderList {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
 .userRow {
   border: 1px solid #e3e9f4;
   border-radius: 12px;
@@ -627,7 +645,22 @@
   align-items: center;
 }
 
+.orderRow {
+  border: 1px solid #e3e9f4;
+  border-radius: 12px;
+  background: #fcfdff;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+}
+
 .userIdentity {
+  min-width: 0;
+}
+
+.orderIdentity {
   min-width: 0;
 }
 
@@ -636,6 +669,15 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  color: #11192d;
+  font-size: 0.96rem;
+}
+
+.orderIdentity h4 {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   color: #11192d;
   font-size: 0.96rem;
 }
@@ -658,13 +700,60 @@
   white-space: nowrap;
 }
 
+.orderIdentity p {
+  margin: 4px 0 0;
+  color: #5d6881;
+  font-size: 0.82rem;
+}
+
+.orderItems {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.orderItemTag {
+  background: #f0f6ff;
+  border: 1px solid #d8e6ff;
+  color: #1d355f;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
 .userMeta {
   display: grid;
   gap: 6px;
   justify-items: end;
 }
 
+.orderMeta {
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+}
+
 .userDate {
+  color: #66738f;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.orderStatus {
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 0.7rem;
+  text-transform: capitalize;
+}
+
+.orderTotal {
+  color: #111a2d;
+  font-size: 0.95rem;
+}
+
+.orderCount {
   color: #66738f;
   font-size: 0.74rem;
   font-weight: 600;
@@ -730,7 +819,15 @@
     grid-template-columns: 1fr;
   }
 
+  .orderRow {
+    grid-template-columns: 1fr;
+  }
+
   .userMeta {
+    justify-items: start;
+  }
+
+  .orderMeta {
     justify-items: start;
   }
 }

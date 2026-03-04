@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import InlineLoader from "../components/InlineLoader";
 import ProductCard from "../components/ProductCard";
 import styles from "./ProductListingPage.module.css";
 import {
@@ -103,7 +104,9 @@ export default function SearchResultsPage() {
       </section>
 
       {loading ? (
-        <section className={styles.messageCard}>Searching products...</section>
+        <section className={styles.messageCard}>
+          <InlineLoader label="Searching products..." />
+        </section>
       ) : errorMessage ? (
         <section className={`${styles.messageCard} ${styles.error}`}>{errorMessage}</section>
       ) : products.length === 0 ? (

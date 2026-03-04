@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import InlineLoader from "../components/InlineLoader";
 import styles from "./CartPage.module.css";
 import {
   CART_UPDATED_EVENT,
@@ -23,7 +24,7 @@ const resolveImageUrl = (rawUrl) => {
   return rawUrl;
 };
 
-const formatMoney = (value) => `Mkw ${Number(value || 0).toFixed(2)}`;
+const formatMoney = (value) => `MWK ${Number(value || 0).toFixed(2)}`;
 
 const toProductMap = (rows) =>
   (Array.isArray(rows) ? rows : []).reduce((acc, row) => {
@@ -175,7 +176,9 @@ export default function CartPage() {
       </div>
 
       {loading ? (
-        <section className={styles.emptyState}>Loading cart...</section>
+        <section className={styles.emptyState}>
+          <InlineLoader label="Loading cart..." />
+        </section>
       ) : cartRows.length === 0 ? (
         <section className={styles.emptyState}>
           <p>Your cart is empty.</p>

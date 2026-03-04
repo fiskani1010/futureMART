@@ -398,3 +398,98 @@ exports.getMyOrders = async (req, res) => {
         return res.status(500).json({ message: "Could not load purchase history" });
     }
 };
+
+exports.getAdminOrders = async (req, res) => {
+    try {
+        await ensureOrderCheckoutTable();
+
+        const rows = await query(
+            db,
+            `
+                SELECT
+                    o.id AS order_id,
+                    o.user_id,
+                    o.total_amount,
+                    o.status,
+                    o.created_at,
+                    u.name AS customer_name,
+                    u.email AS customer_email,
+                    oc.first_name,
+                    oc.last_name,
+                    oc.company_name,
+                    oc.street_address,
+                    oc.apartment,
+                    oc.city,
+                    oc.phone_number,
+                    oc.email AS billing_email,
+                    oc.payment_method,
+                    oc.bank_name,
+                    oc.coupon_code,
+                    oc.discount_amount,
+                    oi.product_id,
+                    oi.quantity,
+                    oi.price,
+                    p.name AS product_name,
+                    p.image AS product_image
+                FROM orders o
+                LEFT JOIN users u ON u.id = o.user_id
+                LEFT JOIN order_checkouts oc ON oc.order_id = o.id
+                LEFT JOIN order_items oi ON oi.order_id = o.id
+                LEFT JOIN products p ON p.id = oi.product_id
+                ORDER BY o.created_at DESC, o.id DESC, oi.id ASC
+            `,
+        );
+
+        const grouped = new Map();
+        (Array.isArray(rows) ? rows : []).forEach((row) => {
+            const orderId = Number(row.order_id);
+            if (!grouped.has(orderId)) {
+                grouped.set(orderId, {
+                    id: orderId,
+                    total_amount: Number(row.total_amount) || 0,
+                    status: row.status || "pending",
+                    created_at: row.created_at,
+                    customer: {
+                        id: Number(row.user_id) || null,
+                        name: row.customer_name || "",
+                        email: row.customer_email || "",
+                    },
+                    billing: {
+                        first_name: row.first_name || "",
+                        last_name: row.last_name || "",
+                        company_name: row.company_name || "",
+                        street_address: row.street_address || "",
+                        apartment: row.apartment || "",
+                        city: row.city || "",
+                        phone_number: row.phone_number || "",
+                        email: row.billing_email || "",
+                    },
+                    payment: {
+                        payment_method: row.payment_method || "",
+                        bank_name: row.bank_name || "",
+                    },
+                    coupon: {
+                        code: row.coupon_code || "",
+                        discount_amount: Number(row.discount_amount) || 0,
+                    },
+                    items: [],
+                });
+            }
+
+            if (row.product_id) {
+                grouped.get(orderId).items.push({
+                    product_id: Number(row.product_id),
+                    product_name: row.product_name || "Product",
+                    product_image: row.product_image || "",
+                    quantity: Number(row.quantity) || 0,
+                    price: Number(row.price) || 0,
+                });
+            }
+        });
+
+        return res.status(200).json(Array.from(grouped.values()));
+    } catch (error) {
+        console.error("Could not load admin orders:", error.message);
+        return res.status(500).json({ message: "Could not load orders" });
+    }
+};

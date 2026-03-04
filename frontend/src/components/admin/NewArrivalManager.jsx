@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus, AiOutlineReload } from "react-icons/ai";
+import InlineLoader from "../InlineLoader";
 
 const getInitialForm = (displayOrder = 1) => ({
   title: "",
@@ -283,7 +284,9 @@ export default function NewArrivalManager({ apiBaseUrl, styles, uploadImageFile,
         </div>
 
         {isLoading ? (
-          <p className={styles.listMessage}>Loading cards...</p>
+          <p className={styles.listMessage}>
+            <InlineLoader label="Loading cards..." />
+          </p>
         ) : cards.length === 0 ? (
           <p className={styles.listMessage}>No cards found. Add your first New Arrival card.</p>
         ) : (

@@ -56,7 +56,7 @@ const STORY_STATS = [
 ];
 
 const SERVICE_POINTS = [
-  { icon: AiOutlineGift, title: "FREE AND FAST DELIVERY", text: "Free delivery for all orders over $140" },
+  { icon: AiOutlineGift, title: "FREE AND FAST DELIVERY", text: "Free delivery for all orders over MWK 140" },
   { icon: AiOutlineShop, title: "24/7 CUSTOMER SERVICE", text: "Friendly 24/7 customer support" },
   { icon: AiOutlineSafety, title: "MONEY BACK GUARANTEE", text: "We return money within 30 days" },
 ];

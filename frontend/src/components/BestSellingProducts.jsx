@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { AiFillHeart, AiFillStar, AiOutlineEye, AiOutlineHeart, AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
+import InlineLoader from "./InlineLoader";
 import styles from "./BestSellingProducts.module.css";
 import { WISHLIST_UPDATED_EVENT, addToCart, getWishlistIds, toggleWishlist } from "../utils/shopStorage";
 
@@ -226,7 +227,9 @@ export default function BestSellingProducts() {
       </header>
 
       {isLoading ? (
-        <p className={styles.message}>Loading best selling products...</p>
+        <p className={styles.message}>
+          <InlineLoader label="Loading best selling products..." />
+        </p>
       ) : !hasProducts ? (
         <p className={styles.message}>No best selling products available yet.</p>
       ) : (
@@ -271,9 +274,9 @@ export default function BestSellingProducts() {
                 </h3>
 
                 <p className={styles.priceRow}>
-                  <span className={styles.price}>${product.price.toFixed(2)}</span>
+                  <span className={styles.price}>MWK {product.price.toFixed(2)}</span>
                   {product.oldPrice !== null && product.oldPrice > product.price ? (
-                    <span className={styles.oldPrice}>${product.oldPrice.toFixed(2)}</span>
+                    <span className={styles.oldPrice}>MWK {product.oldPrice.toFixed(2)}</span>
                   ) : null}
                 </p>
 

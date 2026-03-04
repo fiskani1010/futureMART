@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import InlineLoader from "../components/InlineLoader";
 import styles from "./CheckoutPage.module.css";
 import { CART_UPDATED_EVENT, clearCart, getCartItems } from "../utils/shopStorage";
 
@@ -51,7 +52,7 @@ const normalizeProductRows = (payload) => {
   return [];
 };
 
-const formatMoney = (value) => `Mkw ${Number(value || 0).toFixed(2)}`;
+const formatMoney = (value) => `MWK ${Number(value || 0).toFixed(2)}`;
 
 const readCheckoutProfile = () => {
   try {
@@ -388,7 +389,9 @@ export default function CheckoutPage() {
       </div>
 
       {loading ? (
-        <section className={styles.message}>Loading checkout details...</section>
+        <section className={styles.message}>
+          <InlineLoader label="Loading checkout details..." />
+        </section>
       ) : checkoutRows.length === 0 ? (
         <section className={styles.emptyState}>
           <h1>Checkout</h1>
