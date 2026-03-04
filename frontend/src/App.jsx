@@ -26,13 +26,11 @@ function App() {
 
   useEffect(() => {
     let isMounted = true;
-    let revealTimeoutId = null;
 
     const hideLoader = () => {
-      if (revealTimeoutId !== null) return;
-      revealTimeoutId = window.setTimeout(() => {
-        if (isMounted) setShowEntryLoader(false);
-      }, 700);
+      if (isMounted) {
+        setShowEntryLoader(false);
+      }
     };
 
     if (document.readyState === "complete") {
@@ -41,16 +39,27 @@ function App() {
       window.addEventListener("load", hideLoader, { once: true });
     }
 
-    const fallbackTimeoutId = window.setTimeout(hideLoader, 2200);
     return () => {
       isMounted = false;
       window.removeEventListener("load", hideLoader);
-      window.clearTimeout(fallbackTimeoutId);
-      if (revealTimeoutId !== null) {
-        window.clearTimeout(revealTimeoutId);
-      }
     };
   }, []);
+
+  useEffect(() => {
+    if (!("scrollRestoration" in window.history)) return undefined;
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+
+    return () => {
+      window.history.scrollRestoration = previousScrollRestoration;
+    };
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [location.key]);
 
   if (showEntryLoader) {
     return (
