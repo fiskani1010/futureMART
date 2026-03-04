@@ -26,3 +26,12 @@ const db = mysql.createPool({
 });
 
 module.exports = db;
+
+db.getConnection((err, conn) => {
+  if (err) {
+    console.error("❌ Database connection failed (full):", err);
+    return;
+  }
+  console.log("✅ Connected to MySQL");
+  conn.release();
+});
