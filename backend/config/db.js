@@ -17,7 +17,7 @@ const db = mysql.createPool({
   queueLimit: 0,
 
   ssl: {
-    ca: fs.readFileSync("/etc/secrets/aiven-ca.pem", "utf8"),
+    ca: fs.readFileSync("/etc/secrets/ca.pem", "utf8"),
     rejectUnauthorized: true,
     servername: process.env.DB_HOST,
   },
