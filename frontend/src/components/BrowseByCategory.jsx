@@ -1,6 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
+import {
+  AiOutlineGift,
+  AiOutlineHeart,
+  AiOutlineHome,
+  AiOutlineLeft,
+  AiOutlineRight,
+  AiOutlineSafety,
+  AiOutlineShoppingCart,
+  AiOutlineTeam,
+  AiOutlineUser,
+} from "react-icons/ai";
 import { SlCamera, SlClock, SlEarphones, SlGameController, SlScreenDesktop, SlScreenSmartphone } from "react-icons/sl";
 import styles from "./BrowseByCategory.module.css";
 import { STORE_CATEGORIES } from "../constants/storeCategories";
@@ -14,8 +24,22 @@ const FALLBACK_CATEGORIES = STORE_CATEGORIES.map((category) => ({
   count: 0,
 }));
 
+const CATEGORY_ICON_BY_KEY = {
+  womansfashion: AiOutlineUser,
+  mensfashion: AiOutlineTeam,
+  electronics: SlScreenDesktop,
+  homeandlifestyle: AiOutlineHome,
+  medicine: AiOutlineSafety,
+  sportsandoutdoor: SlGameController,
+  babysandtoys: AiOutlineGift,
+  groceriesandpets: AiOutlineShoppingCart,
+  healthandbeauty: AiOutlineHeart,
+};
+
 const getCategoryIcon = (categoryName) => {
   const normalized = normalizeCategoryKey(categoryName);
+  const explicitIcon = CATEGORY_ICON_BY_KEY[normalized];
+  if (explicitIcon) return explicitIcon;
 
   if (normalized.includes("phone") || normalized.includes("mobile")) return SlScreenSmartphone;
   if (normalized.includes("computer") || normalized.includes("laptop") || normalized.includes("desktop")) {
