@@ -4,7 +4,6 @@ import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import Header from "./components/Header";
 import SiteFooter from "./components/SiteFooter";
-import logoImage from "./assets/logo.png";
 import AboutPage from "./pages/AboutPage";
 import AdminPage from "./pages/AdminPage";
 import AccountPage from "./pages/AccountPage";
@@ -57,8 +56,9 @@ function App() {
     return (
       <div className="appSplash" role="status" aria-live="polite">
         <div className="appSplashContent">
-          <img src={logoImage} alt="FutureMart logo" className="appSplashLogo" />
+          <div className="appSplashSpinner" aria-hidden="true" />
           <p className="appSplashDomain">futureMart.com.mw</p>
+          <p className="appSplashCaption">Loading your store...</p>
         </div>
       </div>
     );
