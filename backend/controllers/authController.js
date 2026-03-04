@@ -82,14 +82,35 @@ const getOtpEmailTemplate = ({ code, purpose, recipientName = "" }) => {
     };
 };
 
+const resolveEmailProvider = () => {
+    const explicitProvider = String(process.env.EMAIL_PROVIDER || "").trim().toLowerCase();
+    if (explicitProvider) {
+        return explicitProvider;
+    }
+
+    if (String(process.env.RESEND_API_KEY || "").trim()) {
+        return "resend";
+    }
+
+    if (String(process.env.BREVO_API_KEY || "").trim()) {
+        return "brevo";
+    }
+
+    return process.env.NODE_ENV === "production" ? "disabled" : "console";
+};
+
 const sendOtpEmail = async ({ to, code, purpose, recipientName }) => {
-    const provider = String(process.env.EMAIL_PROVIDER || "console").trim().toLowerCase();
+    const provider = resolveEmailProvider();
     const fromEmail = String(process.env.EMAIL_FROM || "").trim();
     const { subject, html } = getOtpEmailTemplate({ code, purpose, recipientName });
 
     if (provider === "console" || !provider) {
         console.log(`[OTP:${purpose}] ${to} => ${code}`);
         return;
+    }
+
+    if (provider === "disabled") {
+        throw new Error("EMAIL_PROVIDER is not configured for production");
     }
 
     if (provider === "resend") {
@@ -157,7 +178,8 @@ const getPublicOtpErrorMessage = (error, fallbackMessage) => {
 
     if (
         rawMessage.includes("RESEND_API_KEY/EMAIL_FROM is missing") ||
-        rawMessage.includes("BREVO_API_KEY/EMAIL_FROM is missing")
+        rawMessage.includes("BREVO_API_KEY/EMAIL_FROM is missing") ||
+        rawMessage.includes("EMAIL_PROVIDER is not configured for production")
     ) {
         return "Email service is not configured. Set EMAIL_PROVIDER, EMAIL_FROM, and provider API key.";
     }
