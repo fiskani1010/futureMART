@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import styles from "./CheckoutPage.module.css";
 import { CART_UPDATED_EVENT, clearCart, getCartItems } from "../utils/shopStorage";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 const FALLBACK_IMAGE = "https://via.placeholder.com/72x72?text=Item";
 const PROFILE_STORAGE_KEY = "futuremart_checkout_profile";
 const COUPONS = {
@@ -108,6 +108,7 @@ export default function CheckoutPage() {
     const loadSessionAndProfile = async () => {
       try {
         const sessionRes = await fetch(`${API_BASE_URL}/api/auth/me`, {
+          method: "GET",
           credentials: "include",
         });
         if (!sessionRes.ok) {
@@ -589,3 +590,4 @@ export default function CheckoutPage() {
     </main>
   );
 }
+

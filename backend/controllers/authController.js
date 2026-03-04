@@ -151,6 +151,32 @@ const sendOtpEmail = async ({ to, code, purpose, recipientName }) => {
     throw new Error("EMAIL_PROVIDER is not supported. Use console, resend, or brevo.");
 };
 
+const getPublicOtpErrorMessage = (error, fallbackMessage) => {
+    const rawMessage = String(error?.message || "");
+    const normalized = rawMessage.toLowerCase();
+
+    if (
+        rawMessage.includes("RESEND_API_KEY/EMAIL_FROM is missing") ||
+        rawMessage.includes("BREVO_API_KEY/EMAIL_FROM is missing")
+    ) {
+        return "Email service is not configured. Set EMAIL_PROVIDER, EMAIL_FROM, and provider API key.";
+    }
+
+    if (rawMessage.includes("EMAIL_PROVIDER is not supported")) {
+        return "EMAIL_PROVIDER is invalid. Use console, resend, or brevo.";
+    }
+
+    if (rawMessage.startsWith("Resend request failed") || rawMessage.startsWith("Brevo request failed")) {
+        return "Email provider rejected the request. Verify EMAIL_FROM and API key settings.";
+    }
+
+    if (normalized.includes("fetch is not defined")) {
+        return "Email sending requires Node.js 18 or newer.";
+    }
+
+    return fallbackMessage;
+};
+
 const ensureOtpTable = async () => {
     if (!ensureOtpTablePromise) {
         ensureOtpTablePromise = query(`
@@ -324,17 +350,22 @@ const clearLoginAttempts = (key) => {
 };
 
 const getCookieOptions = () => {
+    const isProduction = process.env.NODE_ENV === "production";
     const configuredSameSite = String(process.env.COOKIE_SAME_SITE || "").trim().toLowerCase();
+    const defaultSameSite = isProduction ? "none" : "lax";
     const sameSite =
         configuredSameSite === "strict" ||
         configuredSameSite === "none" ||
         configuredSameSite === "lax"
             ? configuredSameSite
-            : "lax";
+            : defaultSameSite;
+    const secureFromEnv = String(process.env.COOKIE_SECURE || "").trim().toLowerCase() === "true";
+    // Browsers reject SameSite=None cookies unless Secure is also true.
+    const secure = secureFromEnv || isProduction || sameSite === "none";
 
     const cookieOptions = {
         httpOnly: true,
-        secure: process.env.COOKIE_SECURE === "true" || process.env.NODE_ENV === "production",
+        secure,
         sameSite,
         maxAge: COOKIE_MAX_AGE_MS,
         path: "/",
@@ -399,7 +430,9 @@ exports.registerUser = async (req, res) => {
         });
     } catch (error) {
         console.error("Could not send registration code:", error.message);
-        return res.status(500).json({ message: "Could not send verification code" });
+        return res.status(500).json({
+            message: getPublicOtpErrorMessage(error, "Could not send verification code"),
+        });
     }
 };
 
@@ -477,7 +510,9 @@ exports.requestPasswordResetCode = async (req, res) => {
         });
     } catch (error) {
         console.error("Could not send password reset code:", error.message);
-        return res.status(500).json({ message: "Could not send password reset code" });
+        return res.status(500).json({
+            message: getPublicOtpErrorMessage(error, "Could not send password reset code"),
+        });
     }
 };
 

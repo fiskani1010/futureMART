@@ -15,7 +15,7 @@ import {
 import { FiLinkedin } from "react-icons/fi";
 import styles from "./AboutPage.module.css";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 const FALLBACK_IMAGE = "https://via.placeholder.com/320x360?text=Team+Member";
 
 const FALLBACK_TEAM = [
@@ -281,3 +281,4 @@ export default function AboutPage() {
     </main>
   );
 }
+

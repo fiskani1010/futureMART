@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./MusicExperienceBanner.module.css";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 const FALLBACK_IMAGE = "https://via.placeholder.com/900x420?text=Music+Product";
 
 const AUDIO_HINTS = ["music", "speaker", "audio", "headphone", "earphone", "sound"];
@@ -159,3 +159,4 @@ export default function MusicExperienceBanner() {
     </section>
   );
 }
+

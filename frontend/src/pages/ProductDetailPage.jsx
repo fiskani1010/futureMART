@@ -4,7 +4,7 @@ import { AiFillStar, AiOutlineHeart, AiOutlineReload, AiOutlineTruck } from "rea
 import styles from "./ProductDetailPage.module.css";
 import { addToCart } from "../utils/shopStorage";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 const FALLBACK_IMAGE = "https://via.placeholder.com/780x620?text=Product";
 
 const resolveImageUrl = (rawUrl) => {
@@ -259,3 +259,4 @@ export default function ProductDetailPage() {
     </main>
   );
 }
+

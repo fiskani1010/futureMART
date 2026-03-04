@@ -4,7 +4,7 @@ import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { addToCart } from "../utils/shopStorage";
 import styles from "./FlashSalesCarousel.module.css";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 const FALLBACK_IMAGE = "https://via.placeholder.com/640x420?text=Product";
 
 const resolveImageUrl = (rawUrl) => {
@@ -145,3 +145,4 @@ export default function FlashSalesCarousel() {
     </section>
   );
 }
+

@@ -9,7 +9,7 @@ import {
   toggleWishlist,
 } from "../utils/shopStorage";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 
 const normalizeResponseList = (payload) => {
   if (Array.isArray(payload)) return payload;
@@ -129,3 +129,4 @@ export default function SearchResultsPage() {
     </main>
   );
 }
+

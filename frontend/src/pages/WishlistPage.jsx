@@ -9,7 +9,7 @@ import {
   toggleWishlist,
 } from "../utils/shopStorage";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 
 export default function WishlistPage() {
   const [products, setProducts] = useState([]);
@@ -118,3 +118,4 @@ export default function WishlistPage() {
     </main>
   );
 }
+

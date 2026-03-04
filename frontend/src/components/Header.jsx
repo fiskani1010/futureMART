@@ -24,7 +24,7 @@ const NAV_LINKS = [
   { to: "/contact", label: "Contact" },
   { to: "/about", label: "About" },
 ];
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 
 const getDisplayName = (user) => {
   const source = String(user?.name || user?.email || "").trim();
@@ -96,6 +96,7 @@ export default function Header() {
     const loadSession = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+          method: "GET",
           credentials: "include",
         });
         if (!response.ok) {
@@ -484,3 +485,4 @@ export default function Header() {
     </header>
   );
 }
+

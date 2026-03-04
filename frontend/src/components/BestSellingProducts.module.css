@@ -12,6 +12,12 @@
   gap: 16px;
 }
 
+.headControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .eyebrow {
   margin: 0;
   display: inline-flex;
@@ -51,6 +57,29 @@
   border-color: #cb3d3d;
 }
 
+.arrows {
+  display: flex;
+  gap: 8px;
+}
+
+.arrows button {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid #d6dde9;
+  background: #fff;
+  color: #34405a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.arrows button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .message {
   margin: 18px 0 0;
   color: #5b667d;
@@ -58,14 +87,28 @@
 
 .grid {
   margin-top: 22px;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: flex;
   gap: 12px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 2px;
+  overscroll-behavior-x: contain;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+  outline: none;
+}
+
+.grid::-webkit-scrollbar {
+  display: none;
 }
 
 .card {
   background: #fff;
-  min-width: 0;
+  min-width: 250px;
+  max-width: 250px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
 }
 
 .imageWrap {
@@ -183,28 +226,25 @@
     padding-right: 14px;
   }
 
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .card {
+    min-width: 230px;
+    max-width: 230px;
   }
 }
 
 @media (max-width: 700px) {
-  .grid {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(220px, 1fr);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    gap: 10px;
-    padding-bottom: 8px;
-    scrollbar-width: none;
+  .head {
+    flex-wrap: wrap;
+    align-items: flex-start;
   }
 
-  .grid::-webkit-scrollbar {
-    display: none;
+  .headControls {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .card {
-    scroll-snap-align: start;
+    min-width: 220px;
+    max-width: 220px;
   }
 }

@@ -30,12 +30,16 @@ This repo is already prepared for both.
 
 Copy [backend/.env.production.example](./backend/.env.production.example) values into your hosting dashboard:
 
-1. `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
-2. `JWT_SECRET` (strong random secret)
-3. `CORS_ORIGIN` (your frontend URL)
-4. `COOKIE_SECURE=true`
-5. `COOKIE_SAME_SITE=none` (for separate frontend/backend domains)
-6. OTP email vars:
+1. `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
+2. DB SSL vars when your host requires TLS:
+   1. `DB_SSL=true`
+   2. `DB_SSL_REJECT_UNAUTHORIZED=true`
+   3. `DB_SSL_CA_PATH=/etc/secrets/ca.pem` (or `DB_SSL_CA` / `DB_SSL_CA_BASE64`)
+3. `JWT_SECRET` (strong random secret)
+4. `CORS_ORIGIN` (your frontend URL)
+5. `COOKIE_SECURE=true`
+6. `COOKIE_SAME_SITE=none` (for separate frontend/backend domains)
+7. OTP email vars:
    1. `EMAIL_PROVIDER=resend` or `EMAIL_PROVIDER=brevo`
    2. `EMAIL_FROM`
    3. `RESEND_API_KEY` or `BREVO_API_KEY`
@@ -50,6 +54,10 @@ Notes:
 
 Set:
 1. `VITE_API_BASE_URL=https://<your-backend-domain>`
+
+Notes:
+1. You can set `VITE_API_BASE_URL` with or without a trailing `/api`.
+2. The frontend normalizes the URL either way.
 
 Use [frontend/.env.production.example](./frontend/.env.production.example) as template.
 
@@ -74,8 +82,9 @@ The API also creates OTP/profile/order-checkout tables at runtime if missing.
 2. In Render: `New` -> `Blueprint`.
 3. Select this repo (Render reads [render.yaml](./render.yaml)).
 4. Fill all `sync: false` env vars in Render dashboard.
-5. Deploy both services.
-6. Set:
+5. If your DB host requires a CA file, add it as a Render Secret File and keep `DB_SSL_CA_PATH=/etc/secrets/ca.pem`.
+6. Deploy both services.
+7. Set:
    1. Frontend `VITE_API_BASE_URL` to backend public URL
    2. Backend `CORS_ORIGIN` to frontend public URL
 

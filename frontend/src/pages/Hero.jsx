@@ -4,7 +4,7 @@ import { AiOutlineArrowRight, AiOutlineRight } from "react-icons/ai";
 import styles from "./Hero.module.css";
 import { STORE_CATEGORIES } from "../constants/storeCategories";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 
 const fallbackSlides = [
   {
@@ -170,3 +170,4 @@ export default function Hero() {
     </section>
   );
 }
+

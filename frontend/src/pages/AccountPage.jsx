@@ -4,7 +4,7 @@ import styles from "./AccountPage.module.css";
 import { WISHLIST_UPDATED_EVENT, getWishlistCount } from "../utils/shopStorage";
 import { clearAuthUser } from "../utils/authStorage";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 
 const formatMoney = (value) => `Mkw ${Number(value || 0).toFixed(2)}`;
 const formatDate = (value) => {
@@ -533,3 +533,4 @@ export default function AccountPage() {
     </main>
   );
 }
+

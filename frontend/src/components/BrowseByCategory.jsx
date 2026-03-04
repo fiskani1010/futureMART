@@ -6,7 +6,7 @@ import styles from "./BrowseByCategory.module.css";
 import { STORE_CATEGORIES } from "../constants/storeCategories";
 import { normalizeCategoryKey, slugifyCategoryName } from "../utils/categoryUtils";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 
 const FALLBACK_CATEGORIES = STORE_CATEGORIES.map((category) => ({
   name: category.name,
@@ -190,3 +190,4 @@ export default function BrowseByCategory() {
     </section>
   );
 }
+

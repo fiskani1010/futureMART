@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { AiFillHeart, AiFillStar, AiOutlineEye, AiOutlineHeart } from "react-icons/ai";
+import { AiFillHeart, AiFillStar, AiOutlineEye, AiOutlineHeart, AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import styles from "./BestSellingProducts.module.css";
 import { WISHLIST_UPDATED_EVENT, addToCart, getWishlistIds, toggleWishlist } from "../utils/shopStorage";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 const FALLBACK_IMAGE = "https://via.placeholder.com/640x420?text=Product";
 
 const resolveImageUrl = (rawUrl) => {
@@ -39,9 +39,12 @@ const topByFallbackSignals = (rows) =>
     .slice(0, 8);
 
 export default function BestSellingProducts() {
+  const carouselRef = useRef(null);
   const [products, setProducts] = useState([]);
   const [wishlistIds, setWishlistIds] = useState(() => getWishlistIds());
   const [isLoading, setIsLoading] = useState(true);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   useEffect(() => {
     const syncWishlist = () => setWishlistIds(getWishlistIds());
@@ -86,6 +89,100 @@ export default function BestSellingProducts() {
 
   const hasProducts = useMemo(() => products.length > 0, [products.length]);
 
+  useEffect(() => {
+    const row = carouselRef.current;
+    if (!row) {
+      setCanScrollLeft(false);
+      setCanScrollRight(false);
+      return undefined;
+    }
+
+    let frameId = 0;
+    const syncArrowState = () => {
+      cancelAnimationFrame(frameId);
+      frameId = requestAnimationFrame(() => {
+        const maxScrollLeft = Math.max(0, row.scrollWidth - row.clientWidth);
+        setCanScrollLeft(row.scrollLeft > 4);
+        setCanScrollRight(row.scrollLeft < maxScrollLeft - 4);
+      });
+    };
+
+    syncArrowState();
+    row.addEventListener("scroll", syncArrowState, { passive: true });
+    window.addEventListener("resize", syncArrowState);
+    return () => {
+      cancelAnimationFrame(frameId);
+      row.removeEventListener("scroll", syncArrowState);
+      window.removeEventListener("resize", syncArrowState);
+    };
+  }, [products.length]);
+
+  const getScrollStep = () => {
+    const row = carouselRef.current;
+    if (!row) return 280;
+
+    const firstCard = row.querySelector(`.${styles.card}`);
+    const rowStyle = window.getComputedStyle(row);
+    const gap = Number.parseFloat(rowStyle.columnGap || rowStyle.gap || "0") || 0;
+    const cardWidth = firstCard?.getBoundingClientRect().width || 260;
+    return cardWidth + gap;
+  };
+
+  const scrollCards = (direction) => {
+    const row = carouselRef.current;
+    if (!row) return;
+
+    row.scrollBy({
+      left: direction * getScrollStep(),
+      behavior: "smooth",
+    });
+  };
+
+  const handleCarouselKeyDown = (event) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      scrollCards(-1);
+      return;
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      scrollCards(1);
+      return;
+    }
+
+    if (event.key === "Home") {
+      const row = carouselRef.current;
+      if (!row) return;
+      event.preventDefault();
+      row.scrollTo({ left: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (event.key === "End") {
+      const row = carouselRef.current;
+      if (!row) return;
+      event.preventDefault();
+      row.scrollTo({ left: row.scrollWidth, behavior: "smooth" });
+    }
+  };
+
+  const handleCarouselWheel = (event) => {
+    const row = carouselRef.current;
+    if (!row) return;
+
+    if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+
+    const maxScrollLeft = Math.max(0, row.scrollWidth - row.clientWidth);
+    if (maxScrollLeft <= 0) return;
+
+    event.preventDefault();
+    row.scrollBy({
+      left: event.deltaY,
+      behavior: "auto",
+    });
+  };
+
   const handleToggleLove = (productId) => {
     toggleWishlist(productId);
     setWishlistIds(getWishlistIds());
@@ -102,9 +199,30 @@ export default function BestSellingProducts() {
           <h2>Best Selling Products</h2>
         </div>
 
-        <Link to="/category/all-products" className={styles.viewAll}>
-          View All
-        </Link>
+        <div className={styles.headControls}>
+          <div className={styles.arrows}>
+            <button
+              type="button"
+              aria-label="Scroll best selling products left"
+              onClick={() => scrollCards(-1)}
+              disabled={!canScrollLeft}
+            >
+              <AiOutlineLeft />
+            </button>
+            <button
+              type="button"
+              aria-label="Scroll best selling products right"
+              onClick={() => scrollCards(1)}
+              disabled={!canScrollRight}
+            >
+              <AiOutlineRight />
+            </button>
+          </div>
+
+          <Link to="/category/all-products" className={styles.viewAll}>
+            View All
+          </Link>
+        </div>
       </header>
 
       {isLoading ? (
@@ -112,7 +230,15 @@ export default function BestSellingProducts() {
       ) : !hasProducts ? (
         <p className={styles.message}>No best selling products available yet.</p>
       ) : (
-        <div className={styles.grid}>
+        <div
+          className={styles.grid}
+          ref={carouselRef}
+          role="region"
+          aria-label="Best selling products carousel"
+          tabIndex={0}
+          onKeyDown={handleCarouselKeyDown}
+          onWheel={handleCarouselWheel}
+        >
           {products.map((product) => {
             const isLoved = wishlistIds.includes(product.id);
             return (
@@ -178,3 +304,4 @@ export default function BestSellingProducts() {
     </section>
   );
 }
+

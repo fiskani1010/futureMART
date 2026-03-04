@@ -9,11 +9,28 @@ const db = require("./config/db");
 const app = express();
 app.set("trust proxy", 1);
 
-const rawCorsOrigins = String(process.env.CORS_ORIGIN || "")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean);
-const allowAnyOrigin = rawCorsOrigins.length === 0;
+const normalizeOrigin = (value) => {
+    const sanitized = String(value || "")
+        .trim()
+        .replace(/^['"]|['"]$/g, "");
+    if (!sanitized) return "";
+
+    try {
+        return new URL(sanitized).origin.toLowerCase();
+    } catch {
+        return sanitized.replace(/\/+$/, "").toLowerCase();
+    }
+};
+
+const allowedCorsOrigins = Array.from(
+    new Set(
+        String(process.env.CORS_ORIGIN || "")
+            .split(",")
+            .map((origin) => normalizeOrigin(origin))
+            .filter(Boolean),
+    ),
+);
+const allowAnyOrigin = allowedCorsOrigins.length === 0;
 
 if (process.env.NODE_ENV === "production" && allowAnyOrigin) {
     console.warn("CORS_ORIGIN is empty in production. This allows any origin and is not recommended.");
@@ -25,7 +42,9 @@ const corsOptions = {
             return callback(null, true);
         }
 
-        if (allowAnyOrigin || rawCorsOrigins.includes(origin)) {
+        const normalizedOrigin = normalizeOrigin(origin);
+
+        if (allowAnyOrigin || allowedCorsOrigins.includes(normalizedOrigin)) {
             return callback(null, true);
         }
 

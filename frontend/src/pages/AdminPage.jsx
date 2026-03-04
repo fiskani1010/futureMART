@@ -16,7 +16,7 @@ import NewArrivalManager from "../components/admin/NewArrivalManager";
 import styles from "./AdminPage.module.css";
 import { STORE_CATEGORY_NAMES } from "../constants/storeCategories";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 const PRODUCT_OTHER_CATEGORY = "__other__";
 const ADMIN_MODULES = [
   {
@@ -348,6 +348,7 @@ export default function AdminPage() {
     const verifySession = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+          method: "GET",
           credentials: "include",
         });
         const data = await response.json().catch(() => ({}));
@@ -1742,3 +1743,4 @@ export default function AdminPage() {
     </main>
   );
 }
+

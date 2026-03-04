@@ -2,8 +2,17 @@ import { useState } from "react";
 import { AiOutlineLock, AiOutlineMail, AiOutlineUser } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import styles from "./Login.module.css";
+import { buildApiUrl } from "../../utils/api";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const parseResponsePayload = async (response) => {
+  const text = await response.text().catch(() => "");
+  if (!text) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { message: text };
+  }
+};
 
 export default function Register({ onSwitchToLogin }) {
   const [name, setName] = useState("");
@@ -26,21 +35,25 @@ export default function Register({ onSwitchToLogin }) {
   };
 
   const requestCode = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/auth/register/request-code`, {
+    const res = await fetch(buildApiUrl("/auth/register/request-code"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ name, email, password }),
     });
-    return res.json().catch(() => ({})).then((data) => ({ ok: res.ok, data }));
+    const data = await parseResponsePayload(res);
+    return { ok: res.ok, status: res.status, data };
   };
 
   const verifyCode = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/auth/register/verify-code`, {
+    const res = await fetch(buildApiUrl("/auth/register/verify-code"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ email, code: otpCode }),
     });
-    return res.json().catch(() => ({})).then((data) => ({ ok: res.ok, data }));
+    const data = await parseResponsePayload(res);
+    return { ok: res.ok, status: res.status, data };
   };
 
   const handleSubmit = async (event) => {
@@ -64,11 +77,11 @@ export default function Register({ onSwitchToLogin }) {
           setMessage(result.data.message || "Verification code sent to your email.");
           setIsError(false);
         } else {
-          setMessage(result.data.message || "Could not send verification code.");
+          setMessage(result.data.message || `Could not send verification code (${result.status}).`);
           setIsError(true);
         }
       } catch {
-        setMessage("Server error");
+        setMessage("Request failed. Check API URL and CORS settings.");
         setIsError(true);
       } finally {
         setIsSubmitting(false);
@@ -90,11 +103,11 @@ export default function Register({ onSwitchToLogin }) {
         setIsError(false);
         resetAll();
       } else {
-        setMessage(result.data.message || "Invalid verification code.");
+        setMessage(result.data.message || `Invalid verification code (${result.status}).`);
         setIsError(true);
       }
     } catch {
-      setMessage("Server error");
+      setMessage("Request failed. Check API URL and CORS settings.");
       setIsError(true);
     } finally {
       setIsSubmitting(false);
@@ -112,11 +125,11 @@ export default function Register({ onSwitchToLogin }) {
         setMessage(result.data.message || "A new code has been sent.");
         setIsError(false);
       } else {
-        setMessage(result.data.message || "Could not resend verification code.");
+        setMessage(result.data.message || `Could not resend verification code (${result.status}).`);
         setIsError(true);
       }
     } catch {
-      setMessage("Server error");
+      setMessage("Request failed. Check API URL and CORS settings.");
       setIsError(true);
     } finally {
       setIsSubmitting(false);

@@ -3,12 +3,21 @@ import { AiOutlineLock, AiOutlineMail, AiOutlineUser } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import styles from "./Login.module.css";
 import { setAuthUser } from "../../utils/authStorage";
-
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+import { buildApiUrl } from "../../utils/api";
 
 const getUserDisplayName = (user) => {
   if (!user) return "";
   return user.name || user.username || user.email || `User ${user.id ?? ""}`.trim();
+};
+
+const parseResponsePayload = async (response) => {
+  const text = await response.text().catch(() => "");
+  if (!text) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { message: text };
+  }
 };
 
 export default function Login({ onSwitchToRegister, onLoginSuccess }) {
@@ -34,12 +43,13 @@ export default function Login({ onSwitchToRegister, onLoginSuccess }) {
 
     const loadSession = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        const response = await fetch(buildApiUrl("/auth/me"), {
+          method: "GET",
           credentials: "include",
         });
         if (!response.ok) return;
 
-        const payload = await response.json().catch(() => ({}));
+        const payload = await parseResponsePayload(response);
         if (!isMounted) return;
 
         const user = payload?.user || null;
@@ -62,14 +72,14 @@ export default function Login({ onSwitchToRegister, onLoginSuccess }) {
     setIsError(false);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const res = await fetch(buildApiUrl("/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ email, password, role }),
       });
 
-      const data = await res.json().catch(() => ({}));
+      const data = await parseResponsePayload(res);
       if (res.ok && data.user) {
         const displayName = getUserDisplayName(data.user) || email;
         setWelcomeUser(displayName);
@@ -78,12 +88,12 @@ export default function Login({ onSwitchToRegister, onLoginSuccess }) {
         setMessage("Login successful.");
         setIsError(false);
       } else {
-        setMessage(data.message || "Login failed");
+        setMessage(data.message || `Login failed (${res.status})`);
         setIsError(true);
       }
     } catch (error) {
       console.error(error);
-      setMessage("Server error");
+      setMessage("Request failed. Check API URL and CORS credentials settings.");
       setIsError(true);
     }
   };
@@ -100,23 +110,24 @@ export default function Login({ onSwitchToRegister, onLoginSuccess }) {
     setForgotIsError(false);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/password/request-code`, {
+      const response = await fetch(buildApiUrl("/auth/password/request-code"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email: forgotEmail }),
       });
-      const payload = await response.json().catch(() => ({}));
+      const payload = await parseResponsePayload(response);
 
       if (response.ok) {
         setForgotStep("reset");
         setForgotMessage(payload.message || "If your email exists, a reset code has been sent.");
         setForgotIsError(false);
       } else {
-        setForgotMessage(payload.message || "Could not send reset code.");
+        setForgotMessage(payload.message || `Could not send reset code (${response.status}).`);
         setForgotIsError(true);
       }
     } catch {
-      setForgotMessage("Server error while requesting reset code.");
+      setForgotMessage("Request failed. Check API URL and CORS settings.");
       setForgotIsError(true);
     } finally {
       setForgotLoading(false);
@@ -141,16 +152,17 @@ export default function Login({ onSwitchToRegister, onLoginSuccess }) {
     setForgotIsError(false);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/password/reset`, {
+      const response = await fetch(buildApiUrl("/auth/password/reset"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           email: forgotEmail,
           code: forgotCode,
           new_password: forgotPassword,
         }),
       });
-      const payload = await response.json().catch(() => ({}));
+      const payload = await parseResponsePayload(response);
 
       if (response.ok) {
         setForgotMessage(payload.message || "Password reset successfully.");
@@ -159,11 +171,11 @@ export default function Login({ onSwitchToRegister, onLoginSuccess }) {
         setForgotPassword("");
         setForgotConfirmPassword("");
       } else {
-        setForgotMessage(payload.message || "Could not reset password.");
+        setForgotMessage(payload.message || `Could not reset password (${response.status}).`);
         setForgotIsError(true);
       }
     } catch {
-      setForgotMessage("Server error while resetting password.");
+      setForgotMessage("Request failed. Check API URL and CORS settings.");
       setForgotIsError(true);
     } finally {
       setForgotLoading(false);

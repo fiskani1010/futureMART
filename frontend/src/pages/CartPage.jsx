@@ -9,7 +9,7 @@ import {
   setCartItemQuantity,
 } from "../utils/shopStorage";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "").replace(/\/api$/i, "");
 const FALLBACK_IMAGE = "https://via.placeholder.com/80x80?text=Item";
 const COUPONS = {
   SAVE10: { discountRate: 0.1, label: "10% off applied." },
@@ -294,3 +294,4 @@ export default function CartPage() {
     </main>
   );
 }
+
